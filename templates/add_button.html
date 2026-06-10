@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Button - Telegram Bot Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            font-size: 20px;
+        }
+        .sidebar a {
+            display: block;
+            padding: 15px 25px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: #0088cc;
+            padding-left: 35px;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #0088cc;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #0088cc;
+        }
+        button {
+            background: #4caf50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .btn-back {
+            background: #666;
+        }
+        .btn-back:hover {
+            background: #555;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #0088cc;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>🤖 Bot Panel</h2>
+        <a href="/dashboard">📊 ড্যাশবোর্ড</a>
+        <a href="/buttons" class="active">🔘 বাটন ম্যানেজ</a>
+        <a href="/users">👥 ইউজার লিস্ট</a>
+        <a href="/broadcast">📢 ব্রডকাস্ট</a>
+        <a href="/logout">🚪 লগআউট</a>
+    </div>
+    <div class="main-content">
+        <div class="card">
+            <h2>➕ নতুন বাটন যোগ করুন</h2>
+            <div class="info">
+                💡 টিপ: বাটনের কী (key) ইংরেজিতে এবং ইউনিক হতে হবে। যেমন: premium_btn, demo_video
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>🔑 কী (Key) *</label>
+                    <input type="text" name="key" required placeholder="e.g., premium_btn">
+                    <small style="color:#666;">শুধু ইংরেজি অক্ষর, সংখ্যা এবং আন্ডারস্কোর ব্যবহার করুন</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>📝 টেক্সট *</label>
+                    <input type="text" name="text" required placeholder="e.g., প্রিমিয়াম গ্রুপ">
+                </div>
+                
+                <div class="form-group">
+                    <label>😊 ইমোজি</label>
+                    <input type="text" name="emoji" value="🔘" placeholder="e.g., 🔥">
+                </div>
+                
+                <div class="form-group">
+                    <label>📤 রেসপন্স টাইপ *</label>
+                    <select name="response_type" id="respType" onchange="toggleType()">
+                        <option value="text">📝 টেক্সট মেসেজ</option>
+                        <option value="photo">🖼️ ফটো/ইমেজ</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="textGroup">
+                    <label>💬 রেসপন্স টেক্সট</label>
+                    <textarea name="response_text" rows="5" placeholder="বাটনে ক্লিক করলে এই মেসেজটি দেখাবে..."></textarea>
+                </div>
+                
+                <div class="form-group" id="photoGroup" style="display:none;">
+                    <label>🖼️ ফটো ফাইল</label>
+                    <input type="file" name="photo" accept="image/*">
+                    <label style="margin-top:10px;">📝 ফটোর ক্যাপশন (ঐচ্ছিক)</label>
+                    <textarea name="caption" rows="3" placeholder="ফটোর নিচে যা দেখাবে..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>🔢 সর্ট অর্ডার</label>
+                    <input type="number" name="sort_order" value="999">
+                    <small style="color:#666;">ছোট সংখ্যা উপরে দেখাবে</small>
+                </div>
+                
+                <button type="submit">✅ বাটন যোগ করুন</button>
+                <a href="/buttons"><button type="button" class="btn-back">🔙 বাতিল</button></a>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function toggleType() {
+            var type = document.getElementById('respType').value;
+            if(type == 'photo') {
+                document.getElementById('textGroup').style.display = 'none';
+                document.getElementById('photoGroup').style.display = 'block';
+            } else {
+                document.getElementById('textGroup').style.display = 'block';
+                document.getElementById('photoGroup').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
