@@ -1,78 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard - Telegram Bot Admin</title>
+    <title>Dashboard</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
-        .sidebar {
-            position: fixed; left: 0; top: 0; width: 260px; height: 100%;
-            background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px 0;
-            overflow-y: auto;
-        }
-        .sidebar h2 { text-align: center; padding: 20px; border-bottom: 1px solid #333; font-size: 18px; }
-        .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; transition: background 0.2s; }
-        .sidebar a:hover, .sidebar a.active { background: #0088cc; }
-        .main-content { margin-left: 260px; padding: 20px; }
-        .header {
-            background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .stats {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: white; padding: 25px; border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .stat-card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
-        .stat-card .number { font-size: 36px; font-weight: bold; color: #0088cc; }
-        .welcome { font-size: 22px; color: #333; margin-bottom: 6px; }
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-left: 0; }
-            .stats { grid-template-columns: 1fr 1fr; }
-        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:#f4f6f9;}
+        .sidebar{position:fixed;left:0;top:0;width:260px;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;padding:20px 0;}
+        .sidebar h2{text-align:center;padding:20px;border-bottom:1px solid #333;}
+        .sidebar a{display:block;padding:15px 25px;color:white;text-decoration:none;}
+        .sidebar a:hover,.sidebar a.active{background:#0088cc;}
+        .main-content{margin-left:260px;padding:20px;}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px;}
+        .stat-card{background:white;padding:25px;border-radius:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+        .stat-card .number{font-size:36px;font-weight:bold;color:#0088cc;}
+        @media(max-width:768px){.sidebar{width:100%;height:auto;position:relative;}.main-content{margin-left:0;}}
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>🤖 Bot Panel</h2>
-        <a href="/dashboard" class="active">📊 ড্যাশবোর্ড</a>
-        <a href="/users">👥 ইউজার লিস্ট</a>
-        <a href="/buttons">🔘 বাটন ম্যানেজার</a>
-        <a href="/broadcast">📢 ব্রডকাস্ট</a>
-        <a href="/logout">🚪 লগআউট</a>
+        <a href="/dashboard" class="active">📊 Dashboard</a>
+        <a href="/buttons">🔘 Buttons</a>
+        <a href="/users">👥 Users</a>
+        <a href="/broadcast">📢 Broadcast</a>
+        <a href="/logout">🚪 Logout</a>
     </div>
     <div class="main-content">
-        <div class="header">
-            <div class="welcome">👋 স্বাগতম, অ্যাডমিন!</div>
-            <p style="color: #666;">আপনার Telegram বটের সব তথ্য এখানে দেখতে পাবেন</p>
-        </div>
         <div class="stats">
-            <div class="stat-card">
-                <h3>👥 মোট ইউজার</h3>
-                <div class="number">{{ total_users }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>📅 আজ জয়েন করেছে</h3>
-                <div class="number">{{ today_joined }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>⭐ প্রিমিয়াম ইউজার</h3>
-                <div class="number">{{ premium_users }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>🔘 সক্রিয় বাটন</h3>
-                <div class="number">{{ active_buttons }} / {{ total_buttons }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>💬 বট স্ট্যাটাস</h3>
-                <div class="number" style="font-size:28px;">🟢 Online</div>
-            </div>
+            <div class="stat-card"><h3>Total Users</h3><div class="number">{{ total_users }}</div></div>
+            <div class="stat-card"><h3>Today Joined</h3><div class="number">{{ today_joined }}</div></div>
+            <div class="stat-card"><h3>Premium</h3><div class="number">{{ premium_users }}</div></div>
+            <div class="stat-card"><h3>Active Buttons</h3><div class="number">{{ active_buttons }}/{{ total_buttons }}</div></div>
         </div>
     </div>
 </body>
