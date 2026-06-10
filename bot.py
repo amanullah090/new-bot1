@@ -1,6 +1,7 @@
 import os
 import time
 import threading
+import sqlite3
 
 import telebot
 from telebot import types
@@ -17,6 +18,7 @@ from database import (
 # ========== কনফিগারেশন ==========
 TOKEN = "8814546620:AAGP8JRif1Qe3b9vkU0bKZPrIK19uTfSA-U"
 ADMIN_ID = 8556230749
+DB_NAME = "bot.db"
 
 BOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PHOTOS_DIR = os.path.join(BOT_DIR, "photos")
@@ -374,6 +376,18 @@ def edit_button_route(key):
         return redirect(url_for('buttons_list'))
     
     return render_template('edit_button.html', button=button)
+
+# ========== টগল বাটন রাউট (এটি নতুন যোগ করা) ==========
+@app.route('/toggle_button/<key>')
+@login_required
+def toggle_button_route(key):
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("UPDATE buttons SET is_active = NOT is_active WHERE key=?", (key,))
+    conn.commit()
+    conn.close()
+    update_all_keyboards()
+    return redirect(url_for('buttons_list'))
 
 @app.route('/delete_button/<key>')
 @login_required
