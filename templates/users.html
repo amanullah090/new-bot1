@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users List - Telegram Bot Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: 260px; height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px 0;
+            overflow-y: auto;
+        }
+        .sidebar h2 { text-align: center; padding: 20px; border-bottom: 1px solid #333; font-size: 18px; }
+        .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; transition: background 0.2s; }
+        .sidebar a:hover, .sidebar a.active { background: #0088cc; }
+        .main-content { margin-left: 260px; padding: 20px; }
+        .header {
+            background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%; background: white; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-collapse: collapse;
+        }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #0088cc; color: white; white-space: nowrap; }
+        tr:hover { background: #f5f5f5; }
+        .premium-badge { background: #4caf50; color: white; padding: 4px 8px; border-radius: 5px; font-size: 12px; }
+        .normal-badge { background: #999; color: white; padding: 4px 8px; border-radius: 5px; font-size: 12px; }
+        .premium-btn, .remove-btn {
+            border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;
+        }
+        .premium-btn { background: #ff9800; color: white; }
+        .remove-btn { background: #f44336; color: white; margin-left: 5px; }
+        .search-box { margin-bottom: 20px; }
+        .search-box input {
+            width: 100%; max-width: 400px; padding: 10px; border: 2px solid #ddd;
+            border-radius: 8px; font-size: 16px;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-left: 0; }
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>🤖 Bot Panel</h2>
+        <a href="/dashboard">📊 ড্যাশবোর্ড</a>
+        <a href="/users" class="active">👥 ইউজার লিস্ট</a>
+        <a href="/buttons">🔘 বাটন ম্যানেজার</a>
+        <a href="/broadcast">📢 ব্রডকাস্ট</a>
+        <a href="/logout">🚪 লগআউট</a>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h2>👥 সকল ইউজারের তালিকা</h2>
+            <p>মোট ইউজার: <strong>{{ total_users }}</strong> জন</p>
+        </div>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="🔍 ইউজার খুঁজুন..." onkeyup="searchTable()">
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Chat ID</th><th>ইউজারনেম</th><th>নাম</th>
+                        <th>জয়েন তারিখ</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user[0] }}</td>
+                        <td>{{ user[1] }}</td>
+                        <td>@{{ user[2] or 'N/A' }}</td>
+                        <td>{{ user[3] or 'N/A' }}</td>
+                        <td>{{ user[4] }}</td>
+                        <td>
+                            {% if user[5] == 1 %}
+                            <span class="premium-badge">⭐ প্রিমিয়াম</span>
+                            {% else %}
+                            <span class="normal-badge">👤 সাধারণ</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="/make_premium" style="display:inline">
+                                <input type="hidden" name="chat_id" value="{{ user[1] }}">
+                                <button type="submit" class="premium-btn">⭐ প্রিমিয়াম</button>
+                            </form>
+                            <form method="post" action="/remove_premium" style="display:inline">
+                                <input type="hidden" name="chat_id" value="{{ user[1] }}">
+                                <button type="submit" class="remove-btn">❌ রিমুভ</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function searchTable() {
+            const filter = document.getElementById("search").value.toLowerCase();
+            const rows = document.querySelectorAll("#userTable tr");
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
