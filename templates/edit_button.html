@@ -1,127 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Button - Telegram Bot Admin</title>
+    <title>Edit Button</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; }
-        .sidebar {
-            position: fixed; left: 0; top: 0; width: 260px; height: 100%;
-            background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px 0;
-            overflow-y: auto;
-        }
-        .sidebar h2 { text-align: center; padding: 20px; border-bottom: 1px solid #333; font-size: 18px; }
-        .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; transition: background 0.2s; }
-        .sidebar a:hover, .sidebar a.active { background: #0088cc; }
-        .main-content { margin-left: 260px; padding: 20px; }
-        .card { background: white; border-radius: 15px; padding: 30px; max-width: 600px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .card h2 { margin-bottom: 25px; color: #333; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 6px; color: #555; font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 10px 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0088cc; }
-        .form-group textarea { resize: vertical; }
-        .current-photo { margin-bottom: 8px; }
-        .current-photo img { max-width: 200px; border-radius: 8px; border: 2px solid #ddd; }
-        .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .checkbox-label input[type=checkbox] { width: 20px; height: 20px; }
-        .actions { display: flex; gap: 15px; margin-top: 25px; }
-        .btn-save {
-            background: linear-gradient(135deg, #0088cc, #00aaff); color: white;
-            border: none; padding: 12px 30px; border-radius: 8px; font-size: 15px; cursor: pointer; flex: 1;
-        }
-        .btn-back {
-            background: #999; color: white; border: none; padding: 12px 30px;
-            border-radius: 8px; font-size: 15px; cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-left: 0; }
-        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:#f4f6f9;}
+        .sidebar{position:fixed;left:0;top:0;width:260px;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;padding:20px 0;}
+        .sidebar a{display:block;padding:15px 25px;color:white;text-decoration:none;}
+        .sidebar a:hover{background:#0088cc;}
+        .main-content{margin-left:260px;padding:20px;}
+        .card{background:white;border-radius:15px;padding:30px;max-width:600px;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+        .form-group{margin-bottom:20px;}
+        .form-group label{display:block;margin-bottom:8px;font-weight:bold;}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;}
+        button{background:#2196f3;color:white;padding:12px 30px;border:none;border-radius:8px;cursor:pointer;}
+        .btn-back{background:#666;}
+        @media(max-width:768px){.sidebar{width:100%;height:auto;position:relative;}.main-content{margin-left:0;}}
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>🤖 Bot Panel</h2>
-        <a href="/dashboard">📊 ড্যাশবোর্ড</a>
-        <a href="/users">👥 ইউজার লিস্ট</a>
-        <a href="/buttons" class="active">🔘 বাটন ম্যানেজার</a>
-        <a href="/broadcast">📢 ব্রডকাস্ট</a>
-        <a href="/logout">🚪 লগআউট</a>
+        <a href="/dashboard">📊 Dashboard</a>
+        <a href="/buttons" class="active">🔘 Buttons</a>
+        <a href="/users">👥 Users</a>
+        <a href="/broadcast">📢 Broadcast</a>
+        <a href="/logout">🚪 Logout</a>
     </div>
     <div class="main-content">
         <div class="card">
-            <h2>✏️ বাটন এডিট করুন</h2>
-            {% if button %}
+            <h2>✏️ Edit Button</h2>
             <form method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>কী</label>
-                    <input type="text" value="{{ button[1] }}" disabled style="background:#f5f5f5;">
-                </div>
-                <div class="form-group">
-                    <label>বাটনের টেক্সট *</label>
-                    <input type="text" name="text" value="{{ button[2] }}" required>
-                </div>
-                <div class="form-group">
-                    <label>ইমোজি</label>
-                    <input type="text" name="emoji" value="{{ button[3] or '' }}">
-                </div>
-                <div class="form-group">
-                    <label>রেসপন্স টাইপ</label>
-                    <select name="response_type" id="typeSelect" onchange="toggleFields(this)">
-                        <option value="text" {% if button[4] != 'photo' %}selected{% endif %}>💬 টেক্সট মেসেজ</option>
-                        <option value="photo" {% if button[4] == 'photo' %}selected{% endif %}>📷 ফটো + ক্যাপশন</option>
-                    </select>
-                </div>
-                <div class="form-group" id="textGroup" {% if button[4] == 'photo' %}style="display:none"{% endif %}>
-                    <label>রেসপন্স টেক্সট</label>
-                    <textarea name="response_text" rows="5">{{ button[5] or '' }}</textarea>
-                </div>
-                <div class="form-group" id="photoGroup" {% if button[4] != 'photo' %}style="display:none"{% endif %}>
-                    <label>ফটো আপলোড (নতুন ফটো দিতে চাইলে)</label>
-                    {% if button[6] %}
-                    <div class="current-photo">
-                        <small style="color:#888;">বর্তমান ফটো:</small><br>
-                        <img src="/photo/{{ button[6]|replace('photos/', '') }}" onerror="this.style.display='none'">
-                    </div>
-                    {% endif %}
-                    <input type="file" name="photo" accept="image/*">
-                    <input type="hidden" name="existing_photo" value="{{ button[6] or '' }}">
-                </div>
-                <div class="form-group" id="captionGroup" {% if button[4] != 'photo' %}style="display:none"{% endif %}>
-                    <label>ক্যাপশন</label>
-                    <textarea name="caption" rows="5">{{ button[8] or '' }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="is_active" {% if button[7] == 1 %}checked{% endif %}>
-                        <span>✅ বাটনটি সক্রিয় রাখুন</span>
-                    </label>
-                </div>
-                <div class="actions">
-                    <button type="submit" class="btn-save">💾 সেভ করুন</button>
-                    <a href="/buttons" class="btn-back">← ফিরে যান</a>
-                </div>
+                <input type="hidden" name="existing_photo" value="{{ button[6] if button else '' }}">
+                <div class="form-group"><label>Key</label><input type="text" value="{{ button[1] if button else '' }}" disabled></div>
+                <div class="form-group"><label>Text</label><input type="text" name="text" value="{{ button[2] if button else '' }}" required></div>
+                <div class="form-group"><label>Emoji</label><input type="text" name="emoji" value="{{ button[3] if button else '🔘' }}"></div>
+                <div class="form-group"><label>Response Type</label><select name="response_type"><option value="text" {% if button and button[4]=='text' %}selected{% endif %}>Text</option><option value="photo" {% if button and button[4]=='photo' %}selected{% endif %}>Photo</option></select></div>
+                <div class="form-group"><label>Response Text</label><textarea name="response_text" rows="5">{{ button[5] if button else '' }}</textarea></div>
+                <div class="form-group"><label><input type="checkbox" name="is_active" {% if button and button[7]==1 %}checked{% endif %}> Active</label></div>
+                <button type="submit">Update</button>
+                <a href="/buttons"><button type="button" class="btn-back">Cancel</button></a>
             </form>
-            {% else %}
-            <p style="color:#f44336;">বাটন পাওয়া যায়নি।</p>
-            <a href="/buttons" class="btn-back" style="display:inline-block;margin-top:15px;">← ফিরে যান</a>
-            {% endif %}
         </div>
     </div>
-    <script>
-        function toggleFields(sel) {
-            const isPhoto = sel.value === 'photo';
-            document.getElementById('textGroup').style.display = isPhoto ? 'none' : '';
-            document.getElementById('photoGroup').style.display = isPhoto ? '' : 'none';
-            document.getElementById('captionGroup').style.display = isPhoto ? '' : 'none';
-        }
-    </script>
 </body>
 </html>
