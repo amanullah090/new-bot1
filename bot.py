@@ -40,7 +40,7 @@ def create_dynamic_keyboard(chat_id):
     
     row = []
     for btn in buttons:
-        if btn[7] == 1:  # is_active
+        if btn[7] == 1:
             btn_text = f"{btn[3]} {btn[2]}".strip()
             row.append(types.KeyboardButton(btn_text))
             if len(row) == 2:
@@ -73,12 +73,12 @@ def start(message):
     add_user(chat_id, username, first_name)
     
     markup = create_dynamic_keyboard(chat_id)
-    welcome = "🔥 *Welcome To My Bot* 🔥\n\nআমি একটি স্মার্ট বট। নিচের বাটনগুলোর মাধ্যমে কন্টেন্ট পেতে পারেন।"
+    welcome = "🔥 Welcome To My Bot 🔥"
     
     if chat_id == ADMIN_ID:
-        welcome += "\n\n👑 আপনি অ্যাডমিন\nনিচে অ্যাডমিন প্যানেল ও পাসওয়ার্ড পরিবর্তনের বাটন পাবেন।"
+        welcome += "\n\n👑 আপনি অ্যাডমিন"
     
-    bot.send_message(chat_id, welcome, reply_markup=markup, parse_mode='Markdown')
+    bot.send_message(chat_id, welcome, reply_markup=markup)
 
 @bot.message_handler(commands=['admin'])
 def admin_command(message):
@@ -92,8 +92,7 @@ def admin_command(message):
     markup.add(types.InlineKeyboardButton("📋 বাটন লিস্ট", callback_data="list_btn"))
     markup.add(types.InlineKeyboardButton("📢 ব্রডকাস্ট", callback_data="broadcast_btn"))
     
-    bot.send_message(ADMIN_ID, "👑 *অ্যাডমিন প্যানেল*\n\nনিচের অপশন বেছে নিন:", 
-                     reply_markup=markup, parse_mode='Markdown')
+    bot.send_message(ADMIN_ID, "👑 অ্যাডমিন প্যানেল\n\nনিচের অপশন বেছে নিন:", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def admin_callback(call):
@@ -102,7 +101,7 @@ def admin_callback(call):
         return
     
     if call.data == "add_btn":
-        msg = bot.send_message(ADMIN_ID, "📝 *বাটনের কী লিখুন (ইংরেজি, স্পেস ছাড়া):*", parse_mode='Markdown')
+        msg = bot.send_message(ADMIN_ID, "📝 বাটনের কী লিখুন (ইংরেজি, স্পেস ছাড়া):")
         bot.register_next_step_handler(msg, add_btn_key)
     
     elif call.data == "list_btn":
@@ -110,24 +109,24 @@ def admin_callback(call):
         if not buttons:
             bot.send_message(ADMIN_ID, "❌ কোনো বাটন নেই!")
             return
-        text = "📋 *বাটনের তালিকা*\n\n"
+        text = "📋 বাটনের তালিকা:\n\n"
         for btn in buttons:
             status = "✅" if btn[7] == 1 else "❌"
-            text += f"{status} `{btn[1]}` → {btn[3]} {btn[2]}\n"
-        bot.send_message(ADMIN_ID, text, parse_mode='Markdown')
+            text += f"{status} {btn[1]} → {btn[3]} {btn[2]}\n"
+        bot.send_message(ADMIN_ID, text)
     
     elif call.data == "broadcast_btn":
-        msg = bot.send_message(ADMIN_ID, "📢 *ব্রডকাস্ট মেসেজ লিখুন:*", parse_mode='Markdown')
+        msg = bot.send_message(ADMIN_ID, "📢 ব্রডকাস্ট মেসেজ লিখুন:")
         bot.register_next_step_handler(msg, broadcast_send)
 
 def add_btn_key(message):
     key = message.text.strip().replace(" ", "_")
-    msg = bot.send_message(ADMIN_ID, "✏️ *বাটনের টেক্সট লিখুন:*", parse_mode='Markdown')
+    msg = bot.send_message(ADMIN_ID, "✏️ বাটনের টেক্সট লিখুন:")
     bot.register_next_step_handler(msg, lambda m: add_btn_text(m, key))
 
 def add_btn_text(message, key):
     text = message.text.strip()
-    msg = bot.send_message(ADMIN_ID, "😊 *ইমোজি দিন (যেমন: 🔥):*", parse_mode='Markdown')
+    msg = bot.send_message(ADMIN_ID, "😊 ইমোজি দিন (যেমন: 🔥):")
     bot.register_next_step_handler(msg, lambda m: add_btn_emoji(m, key, text))
 
 def add_btn_emoji(message, key, text):
@@ -135,7 +134,7 @@ def add_btn_emoji(message, key, text):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("📝 টেক্সট", callback_data=f"type_text_{key}_{text}_{emoji}"))
     markup.add(types.InlineKeyboardButton("🖼️ ফটো", callback_data=f"type_photo_{key}_{text}_{emoji}"))
-    bot.send_message(ADMIN_ID, "📤 *রেসপন্স টাইপ সিলেক্ট করুন:*", reply_markup=markup, parse_mode='Markdown')
+    bot.send_message(ADMIN_ID, "📤 রেসপন্স টাইপ সিলেক্ট করুন:", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("type_"))
 def add_btn_type(call):
@@ -146,15 +145,15 @@ def add_btn_type(call):
     emoji = parts[4]
     
     if resp_type == "text":
-        msg = bot.send_message(ADMIN_ID, "✏️ *রেসপন্স টেক্সট লিখুন:*", parse_mode='Markdown')
+        msg = bot.send_message(ADMIN_ID, "✏️ রেসপন্স টেক্সট লিখুন:")
         bot.register_next_step_handler(msg, lambda m: save_text_btn(m, key, text, emoji))
     else:
-        msg = bot.send_message(ADMIN_ID, "🖼️ *ফটো পাঠান (caption দিতে পারবেন):*", parse_mode='Markdown')
+        msg = bot.send_message(ADMIN_ID, "🖼️ ফটো পাঠান:")
         bot.register_next_step_handler(msg, lambda m: save_photo_btn(m, key, text, emoji))
 
 def save_text_btn(message, key, text, emoji):
     add_button(key, text, emoji, 'text', message.text.strip(), '', '', 999)
-    bot.send_message(ADMIN_ID, f"✅ বাটন যোগ হয়েছে!\n`{emoji} {text}`", parse_mode='Markdown')
+    bot.send_message(ADMIN_ID, f"✅ বাটন যোগ হয়েছে! {emoji} {text}")
     update_all_keyboards()
 
 def save_photo_btn(message, key, text, emoji):
@@ -167,7 +166,7 @@ def save_photo_btn(message, key, text, emoji):
             f.write(downloaded_file)
         caption = message.caption or ""
         add_button(key, text, emoji, 'photo', '', photo_path, caption, 999)
-        bot.send_message(ADMIN_ID, f"✅ বাটন যোগ হয়েছে (ফটো সহ)!\n`{emoji} {text}`", parse_mode='Markdown')
+        bot.send_message(ADMIN_ID, f"✅ বাটন যোগ হয়েছে (ফটো সহ)! {emoji} {text}")
         update_all_keyboards()
     else:
         bot.send_message(ADMIN_ID, "❌ ফটো পাঠাননি! আবার চেষ্টা করুন।")
@@ -179,7 +178,7 @@ def broadcast_send(message):
     
     for user in users:
         try:
-            bot.send_message(user[1], f"📢 *ব্রডকাস্ট*\n\n{message.text}", parse_mode='Markdown')
+            bot.send_message(user[1], f"📢 ব্রডকাস্ট:\n\n{message.text}")
             success += 1
         except:
             fail += 1
@@ -193,7 +192,7 @@ def help_command(message):
 
 @bot.message_handler(commands=['myid'])
 def myid_command(message):
-    bot.reply_to(message, f"🆔 আপনার আইডি: `{message.chat.id}`", parse_mode='Markdown')
+    bot.reply_to(message, f"🆔 আপনার আইডি: {message.chat.id}")
 
 def admin_panel_msg(message):
     if message.chat.id != ADMIN_ID:
@@ -201,9 +200,7 @@ def admin_panel_msg(message):
     panel_text = f"""👑 অ্যাডমিন প্যানেল
 
 🌐 ওয়েব প্যানেল: https://new-bot1-1.onrender.com
-🔑 পাসওয়ার্ড: admin123
-
-💡 পাসওয়ার্ড পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।"""
+🔑 পাসওয়ার্ড: admin123"""
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("🌐 প্যানেল ওপেন করুন", url="https://new-bot1-1.onrender.com"))
     bot.send_message(message.chat.id, panel_text, reply_markup=markup)
@@ -222,7 +219,7 @@ def change_pass_process(message):
         bot.reply_to(message, "❌ পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!")
         return
     update_admin_password(new_pass)
-    bot.reply_to(message, f"✅ পাসওয়ার্ড পরিবর্তন হয়েছে!\n🔑 নতুন পাসওয়ার্ড: `{new_pass}`", parse_mode='Markdown')
+    bot.reply_to(message, f"✅ পাসওয়ার্ড পরিবর্তন হয়েছে!\n🔑 নতুন পাসওয়ার্ড: {new_pass}")
 
 @bot.message_handler(func=lambda message: True)
 def handle_buttons(message):
@@ -260,7 +257,7 @@ def handle_buttons(message):
 
 # ========== Flask ওয়েব অ্যাপ ==========
 app = Flask(__name__, template_folder=os.path.join(BOT_DIR, "templates"))
-app.secret_key = "your_secret_key_here_change_it"
+app.secret_key = "your_secret_key_here"
 
 def login_required(f):
     from functools import wraps
@@ -298,7 +295,8 @@ def dashboard():
 @app.route('/users')
 @login_required
 def users_list():
-    return render_template('users.html', users=get_all_users(), total_users=get_user_count())
+    users = get_all_users()
+    return render_template('users.html', users=users, total_users=len(users))
 
 @app.route('/make_premium', methods=['POST'])
 @login_required
