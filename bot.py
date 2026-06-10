@@ -319,30 +319,27 @@ def buttons_list():
 @login_required
 def add_button_page():
     if request.method == 'POST':
-        try:
-            photo_path = ""
-            
-            if request.form.get('response_type') == 'photo':
-                file = request.files.get('photo')
-                if file and file.filename and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    photo_path = os.path.join(PHOTOS_DIR, filename)
-                    file.save(photo_path)
-            
-            add_button(
-                request.form['key'],
-                request.form['text'],
-                request.form.get('emoji', '🔘'),
-                request.form.get('response_type', 'text'),
-                request.form.get('response_text', ''),
-                photo_path,
-                request.form.get('caption', ''),
-                int(request.form.get('sort_order', 999))
-            )
-            update_all_keyboards()
-            return redirect(url_for('buttons_list'))
-        except Exception as e:
-            return f"❌ এরর: {str(e)}", 400
+        photo_path = ""
+        
+        if request.form.get('response_type') == 'photo':
+            file = request.files.get('photo')
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                photo_path = os.path.join(PHOTOS_DIR, filename)
+                file.save(photo_path)
+        
+        add_button(
+            request.form['key'],
+            request.form['text'],
+            request.form.get('emoji', '🔘'),
+            request.form.get('response_type', 'text'),
+            request.form.get('response_text', ''),
+            photo_path,
+            request.form.get('caption', ''),
+            int(request.form.get('sort_order', 999))
+        )
+        update_all_keyboards()
+        return redirect(url_for('buttons_list'))
     
     return render_template('add_button.html')
 
