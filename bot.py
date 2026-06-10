@@ -16,8 +16,8 @@ from database import (
 
 # ── Config ─────────────────────────────────────────────────────────────────
 
-TOKEN = os.environ.get("8814546620:AAGP8JRif1Qe3b9vkU0bKZPrIK19uTfSA-U", "")
-ADMIN_ID = int(os.environ.get("8556230749", "0"))
+TOKEN = "8814546620:AAGP8JRif1Qe3b9vkU0bKZPrIK19uTfSA-U"
+ADMIN_ID = 8556230749
 BOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PHOTOS_DIR = os.path.join(BOT_DIR, "photos")
 os.makedirs(PHOTOS_DIR, exist_ok=True)
