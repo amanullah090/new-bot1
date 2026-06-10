@@ -1,86 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Login - Telegram Bot</title>
+    <title>Admin Login</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 400px;
-            max-width: 90%;
-        }
-        .login-header {
-            background: linear-gradient(135deg, #0088cc, #00aaff);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            border-radius: 20px 20px 0 0;
-        }
-        .login-header h1 { font-size: 28px; margin-bottom: 5px; }
-        .login-header p { opacity: 0.9; font-size: 14px; }
-        .login-body { padding: 30px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        .input-group input:focus { outline: none; border-color: #0088cc; }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #0088cc, #00aaff);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        button:hover { transform: translateY(-2px); }
-        .error {
-            background: #fee;
-            color: #c00;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;}
+        .login-container{background:white;border-radius:20px;width:400px;max-width:90%;}
+        .login-header{background:linear-gradient(135deg,#0088cc,#00aaff);color:white;padding:30px;text-align:center;border-radius:20px 20px 0 0;}
+        .login-header h1{font-size:28px;}
+        .login-body{padding:30px;}
+        .input-group{margin-bottom:20px;}
+        .input-group input{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;}
+        button{width:100%;padding:12px;background:linear-gradient(135deg,#0088cc,#00aaff);color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;}
+        .error{background:#fee;color:#c00;padding:10px;border-radius:8px;margin-bottom:15px;text-align:center;}
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="login-header">
-            <h1>🤖 Telegram Bot</h1>
-            <p>Admin Control Panel</p>
-        </div>
+        <div class="login-header"><h1>🤖 Bot Panel</h1><p>Admin Login</p></div>
         <div class="login-body">
-            {% if error %}
-            <div class="error">{{ error }}</div>
-            {% endif %}
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
             <form method="post">
-                <div class="input-group">
-                    <label>🔐 পাসওয়ার্ড</label>
-                    <input type="password" name="password" placeholder="আপনার পাসওয়ার্ড লিখুন" required autofocus>
-                </div>
-                <button type="submit">🚪 লগইন করুন</button>
+                <div class="input-group"><input type="password" name="password" placeholder="🔐 Password" required></div>
+                <button type="submit">Login</button>
             </form>
         </div>
     </div>
