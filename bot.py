@@ -4,7 +4,7 @@ import threading
 
 import telebot
 from telebot import types
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from werkzeug.utils import secure_filename
 
 from database import (
@@ -34,7 +34,7 @@ init_db()
 bot = telebot.TeleBot(TOKEN)
 
 # ========== ডায়নামিক কিবোর্ড তৈরি ==========
-def create_dynamic_keyboard(message):
+def create_dynamic_keyboard(chat_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     buttons = get_all_buttons()
     
@@ -49,11 +49,20 @@ def create_dynamic_keyboard(message):
     if row:
         markup.row(*row)
     
-    if message.chat.id == ADMIN_ID:
+    if chat_id == ADMIN_ID:
         markup.row(types.KeyboardButton("👑 অ্যাডমিন প্যানেল 👑"))
         markup.row(types.KeyboardButton("🔐 পাসওয়ার্ড পরিবর্তন 🔐"))
     
     return markup
+
+def update_all_keyboards():
+    users = get_all_users()
+    for user in users:
+        try:
+            markup = create_dynamic_keyboard(user[1])
+            bot.send_message(user[1], "🔄 কিবোর্ড আপডেট হয়েছে!", reply_markup=markup)
+        except:
+            pass
 
 # ========== বট কমান্ড ==========
 @bot.message_handler(commands=['start'])
@@ -63,7 +72,7 @@ def start(message):
     first_name = message.chat.first_name or ""
     add_user(chat_id, username, first_name)
     
-    markup = create_dynamic_keyboard(message)
+    markup = create_dynamic_keyboard(chat_id)
     welcome = "🔥 *Welcome To My Bot* 🔥\n\nআমি একটি স্মার্ট বট। নিচের বাটনগুলোর মাধ্যমে কন্টেন্ট পেতে পারেন।"
     
     if chat_id == ADMIN_ID:
@@ -177,17 +186,6 @@ def broadcast_send(message):
         time.sleep(0.05)
     
     bot.send_message(ADMIN_ID, f"✅ ব্রডকাস্ট শেষ!\nসফল: {success}\nব্যর্থ: {fail}")
-
-def update_all_keyboards():
-    users = get_all_users()
-    for user in users:
-        try:
-            fake_msg = types.User(id=user[1], is_bot=False, first_name="")
-            fake_msg.chat = types.Chat(id=user[1], type="private")
-            markup = create_dynamic_keyboard(fake_msg)
-            bot.send_message(user[1], "🔄 কিবোর্ড আপডেট হয়েছে!", reply_markup=markup)
-        except:
-            pass
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
@@ -319,6 +317,84 @@ def remove_premium_route():
 def buttons_list():
     return render_template('buttons.html', buttons=get_all_buttons())
 
+@app.route('/add_button_page', methods=['GET', 'POST'])
+@login_required
+def add_button_page():
+    if request.method == 'POST':
+        photo_path = ""
+        
+        if request.form.get('response_type') == 'photo':
+            file = request.files.get('photo')
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                photo_path = os.path.join(PHOTOS_DIR, filename)
+                file.save(photo_path)
+        
+        add_button(
+            request.form['key'],
+            request.form['text'],
+            request.form.get('emoji', '🔘'),
+            request.form.get('response_type', 'text'),
+            request.form.get('response_text', ''),
+            photo_path,
+            request.form.get('caption', ''),
+            int(request.form.get('sort_order', 999))
+        )
+        update_all_keyboards()
+        return redirect(url_for('buttons_list'))
+    
+    return render_template('add_button.html')
+
+@app.route('/edit_button/<key>', methods=['GET', 'POST'])
+@login_required
+def edit_button_route(key):
+    button = get_button_by_key(key)
+    if not button:
+        return "বাটন খুঁজে পাওয়া যায়নি", 404
+    
+    if request.method == 'POST':
+        photo_path = button[6]
+        
+        if request.form.get('response_type') == 'photo':
+            file = request.files.get('photo')
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                photo_path = os.path.join(PHOTOS_DIR, filename)
+                file.save(photo_path)
+        
+        update_button(
+            key,
+            request.form.get('text'),
+            request.form.get('emoji', '🔘'),
+            request.form.get('response_type'),
+            request.form.get('response_text', ''),
+            photo_path,
+            request.form.get('caption', ''),
+            1 if request.form.get('is_active') == 'on' else 0
+        )
+        update_all_keyboards()
+        return redirect(url_for('buttons_list'))
+    
+    return render_template('edit_button.html', button=button)
+
+@app.route('/delete_button/<key>')
+@login_required
+def delete_button_route(key):
+    btn = get_button_by_key(key)
+    if btn and btn[6] and os.path.exists(btn[6]):
+        try:
+            os.remove(btn[6])
+        except:
+            pass
+    delete_button(key)
+    update_all_keyboards()
+    return redirect(url_for('buttons_list'))
+
+@app.route('/photo/<filename>')
+@login_required
+def serve_photo(filename):
+    return send_from_directory(PHOTOS_DIR, filename)
+
 @app.route('/broadcast', methods=['GET', 'POST'])
 @login_required
 def broadcast():
@@ -359,7 +435,7 @@ def run_web():
 
 if __name__ == "__main__":
     print("🚀 Starting Telegram Bot + Web Dashboard...")
-    print(f"👑 Admin ID: {ADMIN_ID}")    
+    print(f"👑 Admin ID: {ADMIN_ID}")
     print("🌐 Web Panel: https://new-bot1-1.onrender.com")
     print("🔑 Password: admin123")
     
